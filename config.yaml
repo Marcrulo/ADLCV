@@ -1,0 +1,17 @@
+# Path to the data directory
+data_path :    "/home/mp/ADLCV"  
+
+# Folder containing the images
+images_folder: "images_B"        
+
+# File containing the lesion labels
+lesion_file:   "labels_B.csv"    
+
+# File containing the shortcuts binary label
+shortcut_file: "shortcuts_B.csv" 
+
+# New image size
+size: [120, 90]
+
+# Batch size
+batch_size: 3
