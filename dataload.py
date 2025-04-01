@@ -32,7 +32,11 @@ class LesionDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.image_paths = sorted(glob.glob(data_path + f"/{config['images_folder']}/*.jpg"))
         self.lesions     = pd.read_csv(data_path + f"/{config['lesion_file']}")
-        self.shortcuts   = pd.read_csv(data_path + f"/{config['shortcut_file']}")[["image","ruler"]]
+        self.shortcuts   = pd.read_csv(data_path + f"/{config['shortcut_file']}")#[["image","ruler"]]
+        self.shortcuts = self.shortcuts[self.shortcuts["ink"] != 1]
+        self.shortcuts = self.shortcuts[self.shortcuts["sticker"] != 1]
+        self.shortcuts = self.shortcuts[["image","ruler"]]
+        
 
     def __len__(self):
         'Returns the total number of samples'
