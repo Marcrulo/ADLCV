@@ -144,7 +144,7 @@ class Diffusion:
         if timesteps_to_save is not None:
             intermediates = []
         with torch.no_grad():
-            x = torch.randn((batch_size, 3, self.img_size, self.img_size)).to(self.device)
+            x = torch.randn((batch_size, 3, int(self.img_size[0]), int(self.img_size[1]))).to(self.device)
             for i in pbar:
                 t = (torch.ones(batch_size) * i).long().to(self.device)
                 # T-1, T-2, .... 0

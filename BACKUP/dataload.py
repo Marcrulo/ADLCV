@@ -68,22 +68,24 @@ class LesionDataset(torch.utils.data.Dataset):
 
         return X, Y
 
+config = yaml.safe_load(open("config.yaml"))
+data_path = config["data_path"]
+size_w, size_h = config["size"][0], config["size"][1]
+train_transform = transforms.Compose(
+    [transforms.Resize((size_h, size_w)), transforms.ToTensor()]
+)
+
+batch_size = config["batch_size"]
+trainset = LesionDataset(
+    transform=train_transform, data_path=data_path, label="shortcut"
+)
+train_loader = DataLoader(
+    trainset, batch_size=batch_size, shuffle=True, num_workers=1, drop_last=True
+)
+
 
 if __name__ == "__main__":
-    config = yaml.safe_load(open("config.yaml"))
-    data_path = config["data_path"]
-    size_w, size_h = config["size"][0], config["size"][1]
-    train_transform = transforms.Compose(
-        [transforms.Resize((size_h, size_w)), transforms.ToTensor()]
-    )
-
-    batch_size = config["batch_size"]
-    trainset = LesionDataset(
-        transform=train_transform, data_path=data_path, label="lesion"
-    )
-    train_loader = DataLoader(
-        trainset, batch_size=batch_size, shuffle=True, num_workers=1
-    )
+    
     for i, (X, Y) in enumerate(train_loader):
         print(X.shape, Y)
         plt.imshow(X[0].permute(1, 2, 0))

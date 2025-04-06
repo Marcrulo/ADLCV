@@ -11,7 +11,21 @@ lesion_file:   "labels_B.csv"
 shortcut_file: "shortcuts_B.csv" 
 
 # New image size
-size: [120, 90]
+# size: [576, 448]
+size : [72,56]
+
+
+# Train_size
+lesion_train: 100
+
+# Validation size
+lesion_val: 8400
+
+# Test size
+lesion_test: 1515
 
 # Batch size
-batch_size: 3
+batch_size: 4
+
+# Seed
+seed: 1

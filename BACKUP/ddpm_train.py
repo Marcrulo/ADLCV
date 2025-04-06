@@ -20,8 +20,11 @@ logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=log
 
 from ddpm import Diffusion
 from model import UNet
+import yaml
 from util import set_seed, prepare_dataloaders, CLASS_LABELS
 set_seed()
+
+config = yaml.safe_load(open("config.yaml"))
 
 def save_images(images, path, show=True, title=None, nrow=10):
     grid = torchvision.utils.make_grid(images, nrow=nrow)
@@ -44,17 +47,14 @@ def create_result_folders(experiment_name):
     os.makedirs(os.path.join("results", experiment_name), exist_ok=True)
 
 
-def train(T=500, cfg=True, img_size=16, input_channels=3, channels=32, 
-          time_dim=256, batch_size=100, lr=1e-3, num_epochs=30, 
-          experiment_name="DDPM-cfg", show=False, device='cpu'):
+def train(img_size, T=500, cfg=True, input_channels=3, channels=32, 
+          time_dim=256, batch_size=1, lr=1e-3, num_epochs=30, 
+          experiment_name="DDPM", show=False, device='cpu'):
 
     create_result_folders(experiment_name)
     train_loader,_,_ = prepare_dataloaders(batch_size)
-
-    num_classes = 5 if cfg else None
-
-    model = UNet(img_size=img_size, c_in=input_channels, c_out=input_channels, 
-                 num_classes=num_classes, time_dim=time_dim,channels=channels, device=device).to(device)
+    
+    model = UNet(img_size=img_size, c_in=input_channels, c_out=input_channels, time_dim=time_dim,channels=channels, device=device).to(device)
     
     diff_type = 'DDPM-cFg' if cfg else 'DDPM'
     diffusion = Diffusion(img_size=img_size, T=T, beta_start=1e-4, beta_end=0.02, diff_type=diff_type, device=device)
@@ -126,26 +126,18 @@ def train(T=500, cfg=True, img_size=16, input_channels=3, channels=32,
 
 
 def main():    
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--cfg', default=False, action='store_true')
-    args = parser.parse_args()
-    cfg = args.cfg
 
-    if cfg:
-        exp_name = 'DDPM-cfg'
-    else :
-        exp_name = 'DDPM'
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"Model will run on {device}, classifier-free guidance: {cfg} \n")
+    print(f"Model will run on {device}\n")
     
-    if not cfg:
-        print(f"To train a classifier-free guidance model, activate the flag by running the script as follows>")
-        print(f"python ddm_train.py --cfg \n")
-        
-
     set_seed()
-    train(cfg=cfg, experiment_name=exp_name, device=device)
+    size_w, size_h = config["size"][0], config["size"][1]
+    batch_size = config['batch_size']
+    train(batch_size=batch_size , 
+          device=device, 
+          num_epochs=2,
+          img_size=np.array([size_w, size_h]))
 
 if __name__ == '__main__':
     main()
