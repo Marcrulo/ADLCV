@@ -1,0 +1,30 @@
+# Path to the data directory
+data_path : "/home/mp/ADLCV"  
+
+# Folder containing the images
+images_folder: "images_B"        
+
+# File containing the lesion labels
+lesion_file:   "labels_B.csv"    
+
+# File containing the shortcuts binary label
+shortcut_file: "shortcuts_B.csv" 
+
+# New image size
+# size: [576, 448]
+size : [72,56]
+
+# Train_size
+lesion_train: 7000
+
+# Validation size
+lesion_val: 1500
+
+# Test size
+lesion_test: 1515
+
+# Batch size
+batch_size: 4
+
+# Seed
+seed: 1
