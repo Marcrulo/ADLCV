@@ -2,6 +2,7 @@
 import os
 import sys
 import glob
+from itertools import compress
 
 # Images
 import PIL.Image as Image
@@ -22,7 +23,7 @@ from torch.utils.data import DataLoader
 import yaml
 
 class LesionDataset(torch.utils.data.Dataset):
-    def __init__(self, transform=None, data_path=None, label="lesion"):
+    def __init__(self, transform=None, data_path=None, label="lesion", remove_shortcut=False):
         "Initialization"
         # load from config file
         self.config = yaml.safe_load(open("config.yaml"))
@@ -40,9 +41,12 @@ class LesionDataset(torch.utils.data.Dataset):
         if self.label == "lesion":
             self.labels = pd.read_csv(self.data_path + f"/{self.config['lesion_file']}")
         else:
-            self.labels = pd.read_csv(self.data_path + f"/{self.config['shortcut_file']}")[
-                ["image", "ruler"]
-            ]
+            self.labels = pd.read_csv(self.data_path + f"/{self.config['shortcut_file']}")[["image", "ruler"]]
+
+        if remove_shortcut:
+            shortcut_mask = self.labels['ruler'] == 1
+            self.labels = self.labels[~shortcut_mask]
+            self.image_paths = list(compress(self.image_paths, ~shortcut_mask))
 
         if transform == None:
             train_transform = transforms.Compose(

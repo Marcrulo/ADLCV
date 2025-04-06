@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 from PIL import Image
 import random
 import torch
@@ -16,9 +17,10 @@ from ddpm import Diffusion
 from model import UNet
 import dataload
 
-##############33
+##############
 from torch.utils.data import DataLoader, random_split
 from torchvision import transforms
+from itertools import compress
 import numpy as np
 import yaml
 config = yaml.safe_load(open("config.yaml"))
@@ -52,14 +54,8 @@ def save_images(images, path, show=True, title=None, nrow=10):
         plt.show()
     plt.close()
 
-def prepare_dataloader(batch_size=batch_size, val_batch_size=batch_size, label="lesion"):
-    dataset = dataload.LesionDataset(transform=None, data_path=data_path, label=label)
-    
-    #print(len(dataset), "images in dataset")
-    #print("Train size: ", train_size)
-    #print("Validation size: ", val_size)
-    #print("Test size: ", test_size)
-    #print("Total size: ", DATASET_SIZE)
+def prepare_dataloader(batch_size=batch_size, val_batch_size=batch_size, label="lesion", remove_shortcut=False):
+    dataset = dataload.LesionDataset(transform=None, data_path=data_path, label=label, remove_shortcut=remove_shortcut)
 
     train_dataset, val_dataset, test_dataset = random_split(
         dataset,
@@ -83,7 +79,7 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
           batch_size=100, lr=1e-3, num_epochs=30, experiment_name="ddpm", show=False):
     """Implements algrorithm 1 (Training) from the ddpm paper at page 4"""
     create_result_folders(experiment_name)
-    train_loader, val_loader, test_loader = prepare_dataloader(batch_size)
+    train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', remove_shortcut=True)
 
     model = UNet(img_size=img_size, c_in=input_channels, c_out=input_channels, 
                  time_dim=time_dim,channels=channels, device=device).to(device)

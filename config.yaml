@@ -15,13 +15,13 @@ shortcut_file: "shortcuts_B.csv"
 size : [72,56]
 
 # Train_size
-lesion_train: 7000
+lesion_train: 0.7
 
 # Validation size
-lesion_val: 1500
+lesion_val: 0.15
 
 # Test size
-lesion_test: 1515
+lesion_test: 0.15
 
 # Batch size
 batch_size: 4
