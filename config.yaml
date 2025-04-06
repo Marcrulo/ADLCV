@@ -1,0 +1,18 @@
+# Path to the data directory
+data_path :    "/zhome/d9/1/213694/courses/adlcv/Final_project"  
+
+# Folder containing the images
+images_folder: ["train_images", "val_images"]      
+  
+# File containing the lesion labels
+lesion_file:   ["train_labels.csv", "val_labels.csv"]    
+
+# File containing the shortcuts binary label
+shortcut_file: "shortcuts_B.csv" 
+
+# New image size
+size: [240, 180] # reversed order when in batch form
+
+
+# Batch size
+batch_size: 16
