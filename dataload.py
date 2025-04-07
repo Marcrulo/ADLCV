@@ -23,7 +23,7 @@ from torch.utils.data import DataLoader
 import yaml
 
 class LesionDataset(torch.utils.data.Dataset):
-    def __init__(self, transform=None, data_path=None, label="lesion", remove_shortcut=False):
+    def __init__(self, transform=None, data_path=None, label="lesion", keep_label=None):
         "Initialization"
         # load from config file
         self.config = yaml.safe_load(open("config.yaml"))
@@ -43,8 +43,8 @@ class LesionDataset(torch.utils.data.Dataset):
         else:
             self.labels = pd.read_csv(self.data_path + f"/{self.config['shortcut_file']}")[["image", "ruler"]]
 
-        if remove_shortcut:
-            shortcut_mask = self.labels['ruler'] == 1
+        if keep_label is not None:
+            shortcut_mask = self.labels['ruler'] == keep_label
             self.labels = self.labels[~shortcut_mask]
             self.image_paths = list(compress(self.image_paths, ~shortcut_mask))
 
@@ -72,23 +72,25 @@ class LesionDataset(torch.utils.data.Dataset):
 
         return X, Y
 
-config = yaml.safe_load(open("config.yaml"))
-data_path = config["data_path"]
-size_w, size_h = config["size"][0], config["size"][1]
-train_transform = transforms.Compose(
-    [transforms.Resize((size_h, size_w)), transforms.ToTensor()]
-)
 
-batch_size = config["batch_size"]
-trainset = LesionDataset(
-    transform=train_transform, data_path=data_path, label="shortcut"
-)
-train_loader = DataLoader(
-    trainset, batch_size=batch_size, shuffle=True, num_workers=1, drop_last=True
-)
 
 
 if __name__ == "__main__":
+    
+    config = yaml.safe_load(open("config.yaml"))
+    data_path = config["data_path"]
+    size_w, size_h = config["size"][0], config["size"][1]
+    train_transform = transforms.Compose(
+        [transforms.Resize((size_h, size_w)), transforms.ToTensor()]
+    )
+
+    batch_size = config["batch_size"]
+    trainset = LesionDataset(
+        transform=train_transform, data_path=data_path, label="shortcut"
+    )
+    train_loader = DataLoader(
+        trainset, batch_size=batch_size, shuffle=True, num_workers=1, drop_last=True
+    )
     
     for i, (X, Y) in enumerate(train_loader):
         print(X.shape, Y)
