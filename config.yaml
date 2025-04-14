@@ -1,14 +1,14 @@
 # Path to the data directory
-data_path : "/home/mp/ADLCV"  
+data_path : "/zhome/65/7/156117/02501/data"  
 
 # Folder containing the images
-images_folder: "images_B"        
+images_folder: "images"        
 
 # File containing the lesion labels
-lesion_file:   "labels_B.csv"    
+lesion_file:   "labels.csv"    
 
 # File containing the shortcuts binary label
-shortcut_file: "shortcuts_B.csv" 
+shortcut_file: "shortcuts.csv" 
 
 # New image size
 # size: [576, 448]

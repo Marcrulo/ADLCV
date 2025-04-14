@@ -3,6 +3,11 @@ from torch.utils.data import DataLoader, random_split
 import torch
 import numpy as np
 import yaml
+import random
+import os
+import torchvision
+from matplotlib import pyplot as plt
+
 config = yaml.safe_load(open("config.yaml"))
 data_path = config["data_path"]
 SEED = config['seed']

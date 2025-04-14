@@ -59,9 +59,10 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
             pbar.set_postfix(MSE=loss.item())
             logger.add_scalar("MSE", loss.item(), global_step=epoch * l + i)
 
-        sampled_images = diffusion.p_sample_loop(model, batch_size=images.shape[0])
-        save_images(images=sampled_images, path=os.path.join("results", experiment_name, f"{epoch}.jpg"),
-                    show=show, title=f'Epoch {epoch}')
+        if epoch % 5 == 0:
+            sampled_images = diffusion.p_sample_loop(model, batch_size=batch_size)
+            save_images(images=sampled_images, path=os.path.join("results", experiment_name, f"{epoch}.jpg"),
+                        show=show, title=f'Epoch {epoch}')
         torch.save(model.state_dict(), os.path.join("models", experiment_name, f"weights-{epoch}.pt"))
 
 
