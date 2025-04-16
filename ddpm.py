@@ -31,7 +31,7 @@ class Diffusion:
         self.alphas_bar = torch.cumprod(self.alphas, dim=0) # cumulative products of alpha
         self.diff_type = diff_type
         self.classifier = None 
-        assert diff_type in {'DDPM', 'DDPM-cg', 'DDPM-cFg'}, 'Invalid diffusion type'
+        assert diff_type in {'DDPM', 'DDIM','DDPM-cg', 'DDPM-cFg'}, 'Invalid diffusion type'
         print(f'Diffusion type: {diff_type}')
 
 
@@ -118,17 +118,6 @@ class Diffusion:
                     # Calculate x_{t-1}, see line 4 of the Algorithm 2 (Sampling) at page 4 of the ddpm paper.
         return x_t_prev
 
-
-    def p_sample_2(self, model, x_t, t, y=None):
-        """
-        Sample from p(x{t-1} | x_t) using the reverse process and model
-        """
-        mean, std = self.p_mean_std(model, x_t, t, y)
-        if t[0] > 1:
-            noise = torch.randn_like(x_t, device=self.device)
-        else:
-            noise = torch.zeros_like(x_t, device=self.device)
-        return mean + std * noise
 
     def p_sample_loop(self, model, batch_size, timesteps_to_save=None, y=None, verbose=True):
         """

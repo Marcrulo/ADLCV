@@ -1,5 +1,6 @@
 from dataload import LesionDataset
 from torch.utils.data import DataLoader, random_split
+import torchvision.transforms as transforms
 import torch
 import numpy as np
 import yaml
@@ -22,6 +23,14 @@ size_w, size_h = config["size"][0], config["size"][1]
 img_size = np.array([size_w, size_h])
 
 def prepare_dataloader(batch_size=batch_size, val_batch_size=batch_size, label="lesion", keep_label=None):
+    
+    transform = transforms.Compose([
+                                transforms.Resize((size_h, size_w)), 
+                                transforms.ToTensor(),
+                                transforms.ColorJitter(brightness=0.3, contrast=0.3),
+                                transforms.RandomAffine(degrees=180, scale=(0.8,1.2))
+                 ])
+    
     dataset = LesionDataset(transform=None, data_path=data_path, label=label, keep_label=keep_label)
 
     train_dataset, val_dataset, test_dataset = random_split(
@@ -50,7 +59,7 @@ def set_seed(seed=SEED):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
 
-def save_images(images, path, show=True, title=None, nrow=10):
+def save_images(images, path, show=True, title=None, nrow=4):
     grid = torchvision.utils.make_grid(images, nrow=nrow)
     ndarr = grid.permute(1, 2, 0).to('cpu').numpy()
     if title is not None:

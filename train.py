@@ -4,6 +4,8 @@ import os
 
 from PIL import Image
 import random
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 import torch
 from torch.utils.tensorboard import SummaryWriter
 import torchvision
@@ -21,6 +23,9 @@ from torchvision import transforms
 from itertools import compress
 import numpy as np
 from utils import *
+
+
+
 
 def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim=256,
           batch_size=100, lr=1e-3, num_epochs=30, experiment_name="ddpm", show=False):
@@ -63,7 +68,8 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
             sampled_images = diffusion.p_sample_loop(model, batch_size=batch_size)
             save_images(images=sampled_images, path=os.path.join("results", experiment_name, f"{epoch}.jpg"),
                         show=show, title=f'Epoch {epoch}')
-        torch.save(model.state_dict(), os.path.join("models", experiment_name, f"weights-{epoch}.pt"))
+
+            # torch.save(model.state_dict(), os.path.join("models", experiment_name, f"weights.pt"))
 
 
 def main():
@@ -75,7 +81,7 @@ def main():
     batch_size = config['batch_size']
     train(batch_size=batch_size , 
           device=device, 
-          num_epochs=30,
+          num_epochs=1000000,
           img_size=np.array([size_w, size_h]))
 
 if __name__ == '__main__':
