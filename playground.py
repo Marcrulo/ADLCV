@@ -39,11 +39,12 @@ if __name__ == '__main__':
     
     # dataset and dataloaders
     transform = transforms.Compose([
-        transforms.ToTensor(),                # from [0,255] to range [0.0,1.0]
-        transforms.Normalize((0.5,), (0.5,))  # range [-1,1]
-    ])
+                                transforms.Resize((img_size[1], img_size[0])), 
+                                transforms.ToTensor(),
+                                transforms.Normalize((0.5,), (0.5,)),
+                 ])
 
-    train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=1)
+    train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=1, transform=transform)
     images, labels  = next(iter(test_loader))
     example_images = np.stack([im_normalize(tens2image(images[idx])) for idx in range(batch_size)], axis=0)
     show(example_images, 'Example images', save_path='assets/example.png')

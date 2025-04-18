@@ -31,7 +31,15 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
           batch_size=100, lr=1e-3, num_epochs=30, experiment_name="ddpm", show=False):
     """Implements algrorithm 1 (Training) from the ddpm paper at page 4"""
     create_result_folders(experiment_name)
-    train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=0)
+
+    transform = transforms.Compose([
+                                transforms.Resize((img_size[0], img_size[1])), 
+                                transforms.ToTensor(),
+                                transforms.Normalize((0.5,), (0.5,)),
+                                # transforms.ColorJitter(brightness=0.3, contrast=0.3),
+                                transforms.RandomAffine(degrees=180)#, scale=(0.8,1.2))
+                 ])
+    train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=0, transform=transform)
 
     model = UNet(img_size=img_size, c_in=input_channels, c_out=input_channels, 
                  time_dim=time_dim,channels=channels, device=device).to(device)
@@ -82,7 +90,7 @@ def main():
     train(batch_size=batch_size , 
           device=device, 
           num_epochs=1000000,
-          img_size=np.array([size_w, size_h]))
+          img_size=np.array([size_h, size_w]))
 
 if __name__ == '__main__':
     main()

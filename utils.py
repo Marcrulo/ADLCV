@@ -22,16 +22,9 @@ batch_size = config['batch_size']
 size_w, size_h = config["size"][0], config["size"][1]
 img_size = np.array([size_w, size_h])
 
-def prepare_dataloader(batch_size=batch_size, val_batch_size=batch_size, label="lesion", keep_label=None):
+def prepare_dataloader(batch_size=batch_size, val_batch_size=batch_size, label="lesion", keep_label=None, transform=None):
     
-    transform = transforms.Compose([
-                                transforms.Resize((size_h, size_w)), 
-                                transforms.ToTensor(),
-                                transforms.ColorJitter(brightness=0.3, contrast=0.3),
-                                transforms.RandomAffine(degrees=180, scale=(0.8,1.2))
-                 ])
-    
-    dataset = LesionDataset(transform=None, data_path=data_path, label=label, keep_label=keep_label)
+    dataset = LesionDataset(transform=transform, data_path=data_path, label=label, keep_label=keep_label)
 
     train_dataset, val_dataset, test_dataset = random_split(
         dataset,
