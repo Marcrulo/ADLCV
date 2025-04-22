@@ -31,7 +31,7 @@ class LesionDataset(torch.utils.data.Dataset):
             self.data_path = self.config['data_path'] 
         else:
             self.data_path = data_path
-        self.size_h, self.size_w = self.config["size"][0], self.config["size"][1]
+        self.size_w, self.size_h = self.config["size"][0], self.config["size"][1]
 
         self.transform = transform
         self.label = label
@@ -45,8 +45,8 @@ class LesionDataset(torch.utils.data.Dataset):
 
         if keep_label is not None:
             shortcut_mask = self.labels['ruler'] == keep_label
-            self.labels = self.labels[~shortcut_mask]
-            self.image_paths = list(compress(self.image_paths, ~shortcut_mask))
+            self.labels = self.labels[shortcut_mask]
+            self.image_paths = list(compress(self.image_paths, shortcut_mask))
 
         if transform == None:
             train_transform = transforms.Compose(

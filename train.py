@@ -26,7 +26,6 @@ from utils import *
 
 
 
-
 def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim=256,
           batch_size=100, lr=1e-3, num_epochs=30, experiment_name="ddpm", show=False):
     """Implements algrorithm 1 (Training) from the ddpm paper at page 4"""
@@ -36,8 +35,9 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
                                 transforms.Resize((img_size[0], img_size[1])), 
                                 transforms.ToTensor(),
                                 transforms.Normalize((0.5,), (0.5,)),
+                                # transforms.RandomRotation(degrees=180)
                                 # transforms.ColorJitter(brightness=0.3, contrast=0.3),
-                                transforms.RandomAffine(degrees=180)#, scale=(0.8,1.2))
+                                # transforms.RandomAffine(degrees=180)#, scale=(0.8,1.2))
                  ])
     train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=0, transform=transform)
 
@@ -50,6 +50,26 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
     
     logger = SummaryWriter(os.path.join("runs", experiment_name))
     l = len(train_loader)
+
+
+    # accumulation_steps = 32  # for example, simulate a batch 4x larger
+    # for epoch in range(1, num_epochs + 1):
+    #     logging.info(f"Starting epoch {epoch}:")
+    #     pbar = tqdm(train_loader)
+    #     optimizer.zero_grad()  # move this outside the loop
+    #     for i, (images, labels) in enumerate(pbar):
+    #         images = images.to(device)
+    #         t = diffusion.sample_timesteps(images.shape[0]).to(device)
+    #         x_t, noise = diffusion.q_sample(images, t)
+    #         predicted_noise = model(x_t, t)
+    #         loss = mse(noise, predicted_noise)
+    #         # Normalize loss to account for accumulation
+    #         loss = loss / accumulation_steps
+    #         loss.backward()
+    #         # Update weights only every accumulation_steps iterations
+    #         if (i + 1) % accumulation_steps == 0 or (i + 1) == len(pbar):
+    #             optimizer.step()
+    #             optimizer.zero_grad()
 
     for epoch in range(1, num_epochs + 1):
         logging.info(f"Starting epoch {epoch}:")
@@ -90,6 +110,7 @@ def main():
     train(batch_size=batch_size , 
           device=device, 
           num_epochs=1000000,
+          time_dim=1024,
           img_size=np.array([size_h, size_w]))
 
 if __name__ == '__main__':

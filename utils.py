@@ -8,6 +8,7 @@ import random
 import os
 import torchvision
 from matplotlib import pyplot as plt
+import itertools
 
 config = yaml.safe_load(open("config.yaml"))
 data_path = config["data_path"]
@@ -20,7 +21,7 @@ DATASET_SIZE = train_size + val_size + test_size
 batch_size = config['batch_size']
 
 size_w, size_h = config["size"][0], config["size"][1]
-img_size = np.array([size_w, size_h])
+img_size = np.array([size_h, size_w])
 
 def prepare_dataloader(batch_size=batch_size, val_batch_size=batch_size, label="lesion", keep_label=None, transform=None):
     

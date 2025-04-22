@@ -37,8 +37,8 @@ ddim = DiffusionImplicit(img_size=img_size, device=device)
 
 # 1. Get an image
 train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=1)
-images, labels  = next(iter(val_loader))
-L = torch.Tensor([50,100,150,200,250,300,350,400,450]).long().to(device)
+images, labels = next(itertools.islice(val_loader, 5, None))
+L = torch.Tensor([5,10,15,20,30]).long().to(device)  
 x0 = images[0].unsqueeze(0).to(device) # add batch dimenstion
 
 # 2. DDPM forward process that image up to a timestep t: 1<L<T
@@ -51,7 +51,7 @@ model.to(device)
 model.load_state_dict(torch.load('models/ddpm/weights.pt', map_location=device, weights_only=False)) # load the given model
 
 Lsize = L.shape[0]
-fig, axs = plt.subplots(Lsize, 4, figsize=(10,4*Lsize))
+fig, axs = plt.subplots(Lsize, 4, figsize=(10,2*Lsize))
 x_new = torch.zeros_like(x0).repeat(Lsize,1,1,1)
 for i, l in enumerate(L):
     x_new[i] = ddim.p_sample_loop(model=model, batch_size=1, partly_noised=xt[i].unsqueeze(0), L=l.item())
@@ -64,7 +64,7 @@ for i, l in enumerate(L):
     im1 = axs[i,0].imshow(img1)
     im2 = axs[i,1].imshow(img2)
     im3 = axs[i,2].imshow(img3)
-    im4 = axs[i,3].imshow(img4, cmap='jet')
+    im4 = axs[i,3].imshow(img4, vmin=0, vmax=1, cmap='jet')
     fig.colorbar(im4, ax=axs[i,3])
 
 
