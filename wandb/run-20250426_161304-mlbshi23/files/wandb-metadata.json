@@ -1,0 +1,42 @@
+{
+  "os": "Linux-6.1.134-1.el9.elrepo.x86_64-x86_64-with-glibc2.34",
+  "python": "CPython 3.9.21",
+  "startedAt": "2025-04-26T14:13:04.705724Z",
+  "program": "/zhome/65/7/156117/02501/PROJECT/ADLCV/train.py",
+  "codePath": "train.py",
+  "git": {
+    "remote": "git@github.com:Marcrulo/ADLCV.git",
+    "commit": "59747090cdfc49fb27b68078575ad2b084fbb966"
+  },
+  "email": "marcus@presutti.eu",
+  "root": "/zhome/65/7/156117/02501/PROJECT/ADLCV",
+  "host": "n-62-11-15",
+  "executable": "/zhome/65/7/156117/02501/PROJECT/ADLCV_venv/bin/python",
+  "codePathLocal": "train.py",
+  "cpu_count": 32,
+  "cpu_count_logical": 32,
+  "gpu": "Tesla V100-PCIE-32GB",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "76817485824",
+      "used": "6287421440"
+    }
+  },
+  "memory": {
+    "total": "404872511488"
+  },
+  "cpu": {
+    "count": 32,
+    "countLogical": 32
+  },
+  "gpu_nvidia": [
+    {
+      "name": "Tesla V100-PCIE-32GB",
+      "memoryTotal": "34359738368",
+      "cudaCores": 5120,
+      "architecture": "Volta"
+    }
+  ],
+  "cudaVersion": "12.8"
+}

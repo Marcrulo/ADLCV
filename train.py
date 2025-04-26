@@ -12,6 +12,7 @@ import torchvision
 from tqdm import tqdm
 from torch import optim
 import logging
+import wandb
 
 logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.INFO, datefmt="%I:%M:%S")
 
@@ -27,7 +28,7 @@ from utils import *
 
 
 def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim=256,
-          batch_size=100, lr=1e-3, num_epochs=30, experiment_name="ddpm", show=False):
+          batch_size=100, lr=1e-3, num_epochs=30, experiment_name="ddpm", show=False, wandb_run=None):
     """Implements algrorithm 1 (Training) from the ddpm paper at page 4"""
     create_result_folders(experiment_name)
 
@@ -48,8 +49,8 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
     optimizer = optim.AdamW(model.parameters(), lr=lr)
     mse = torch.nn.MSELoss() # use MSE loss 
     
-    logger = SummaryWriter(os.path.join("runs", experiment_name))
-    l = len(train_loader)
+    # logger = SummaryWriter(os.path.join("runs", experiment_name))
+    # l = len(train_loader)
 
 
     # accumulation_steps = 32  # for example, simulate a batch 4x larger
@@ -72,10 +73,10 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
     #             optimizer.zero_grad()
 
     for epoch in range(1, num_epochs + 1):
-        logging.info(f"Starting epoch {epoch}:")
-        pbar = tqdm(train_loader)
+        # logging.info(f"Starting epoch {epoch}:")
+        # pbar = tqdm(train_loader)
         
-        for i, (images, labels) in enumerate(pbar):
+        for i, (images, labels) in enumerate(train_loader): #enumerate(pbar):
             images = images.to(device)
 
             # TASK 4: implement the training loop
@@ -88,16 +89,17 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
             loss.backward()
             optimizer.step()
 
-
-            pbar.set_postfix(MSE=loss.item())
-            logger.add_scalar("MSE", loss.item(), global_step=epoch * l + i)
+            # pbar.set_postfix(MSE=loss.item())
+            # logger.add_scalar("MSE", loss.item(), global_step=epoch * l + i)
+            if wandb_run is not None:
+                wandb_run.log({"MSE": loss.item()})
 
         if epoch % 5 == 0:
             sampled_images = diffusion.p_sample_loop(model, batch_size=batch_size)
             save_images(images=sampled_images, path=os.path.join("results", experiment_name, f"{epoch}.jpg"),
                         show=show, title=f'Epoch {epoch}')
 
-            # torch.save(model.state_dict(), os.path.join("models", experiment_name, f"weights.pt"))
+            torch.save(model.state_dict(), os.path.join("models", experiment_name, f"weights.pt"))
 
 
 def main():
@@ -105,13 +107,27 @@ def main():
     print(f"Model will run on {device}")
     set_seed(seed=SEED)
     
+
+    # Start a new wandb run to track this script.
+    num_epochs = 100000
     size_w, size_h = config["size"][0], config["size"][1]
     batch_size = config['batch_size']
+    run = wandb.init(
+        entity="crulotest",
+        project="ADLCV_exam",
+        config={
+            "batch_size": batch_size,
+            "size_w": size_w,
+            "size_h": size_h,
+            "epochs": num_epochs,
+        },
+    )
     train(batch_size=batch_size , 
           device=device, 
-          num_epochs=1000000,
+          num_epochs=num_epochs,
           time_dim=1024,
-          img_size=np.array([size_h, size_w]))
+          img_size=np.array([size_h, size_w]),
+          wandb_run=run)
 
 if __name__ == '__main__':
     main()

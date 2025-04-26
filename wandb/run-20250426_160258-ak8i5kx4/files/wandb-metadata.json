@@ -1,0 +1,31 @@
+{
+  "os": "Linux-6.1.131-1.el9.elrepo.x86_64-x86_64-with-glibc2.34",
+  "python": "CPython 3.9.21",
+  "startedAt": "2025-04-26T14:02:58.486055Z",
+  "program": "/zhome/65/7/156117/02501/PROJECT/ADLCV/wandb_test.py",
+  "codePath": "wandb_test.py",
+  "git": {
+    "remote": "git@github.com:Marcrulo/ADLCV.git",
+    "commit": "59747090cdfc49fb27b68078575ad2b084fbb966"
+  },
+  "email": "marcus@presutti.eu",
+  "root": "/zhome/65/7/156117/02501/PROJECT/ADLCV",
+  "host": "n-62-30-5",
+  "executable": "/zhome/65/7/156117/02501/PROJECT/ADLCV_venv/bin/python",
+  "codePathLocal": "wandb_test.py",
+  "cpu_count": 20,
+  "cpu_count_logical": 20,
+  "disk": {
+    "/": {
+      "total": "76817485824",
+      "used": "5759201280"
+    }
+  },
+  "memory": {
+    "total": "269491822592"
+  },
+  "cpu": {
+    "count": 20,
+    "countLogical": 20
+  }
+}
