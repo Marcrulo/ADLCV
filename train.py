@@ -125,7 +125,7 @@ def main():
     train(batch_size=batch_size , 
           device=device, 
           num_epochs=num_epochs,
-          time_dim=1024,
+          time_dim=256,
           img_size=np.array([size_h, size_w]),
           wandb_run=run)
 

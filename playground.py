@@ -13,6 +13,38 @@ from model import UNet
 
 from utils import *
 
+import PIL.Image as Image
+from PIL import ImageDraw
+
+class AddColorBlobs:
+    def __init__(self, num_blobs=5, size_range=(5, 50)):
+        self.num_blobs = num_blobs
+        self.size_range = size_range
+
+    def __call__(self, img):
+        if not isinstance(img, Image.Image):
+            img = transforms.ToPILImage()(img)
+
+        draw = ImageDraw.Draw(img)
+        width, height = img.size
+
+        for _ in range(self.num_blobs):
+            # Random blob position and size
+            x = random.randint(0, width)
+            y = random.randint(0, height)
+            r = random.randint(*self.size_range)
+
+            # Random color
+            color = tuple(np.random.randint(0, 256, size=3))
+
+            # Draw a circle
+            bbox = (x - r, y - r, x + r, y + r)
+            draw.ellipse(bbox, fill=color, outline=None)
+
+        return img
+
+
+
 def show(imgs, title=None, fig_titles=None, save_path=None): 
 
     if fig_titles is not None:
@@ -39,7 +71,9 @@ if __name__ == '__main__':
     
     # dataset and dataloaders
     transform = transforms.Compose([
-                                transforms.Resize((img_size[1], img_size[0])), 
+                                transforms.Resize((img_size[0], img_size[1])), 
+                                transforms.ToTensor(),
+                                AddColorBlobs(num_blobs=1),
                                 transforms.ToTensor(),
                                 transforms.Normalize((0.5,), (0.5,)),
                  ])

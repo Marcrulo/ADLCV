@@ -22,6 +22,7 @@ from torch.utils.data import DataLoader
 # Config
 import yaml
 
+
 class LesionDataset(torch.utils.data.Dataset):
     def __init__(self, transform=None, data_path=None, label="lesion", keep_label=None):
         "Initialization"
