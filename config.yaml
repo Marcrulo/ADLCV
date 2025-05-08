@@ -1,0 +1,31 @@
+# Path to the data directory
+data_path : "/zhome/65/7/156117/02501/data"  
+
+# Folder containing the images
+images_folder: "images"        
+
+# File containing the lesion labels
+lesion_file:   "labels.csv"    
+
+# File containing the shortcuts binary label
+shortcut_file: "shortcuts.csv" 
+
+# New image size (width, height)
+# size: [576, 448]
+size : [72,56]
+# size : [144, 112]
+
+# Train_size
+lesion_train: 0.7
+
+# Validation size
+lesion_val: 0.15
+
+# Test size
+lesion_test: 0.15
+
+# Batch size
+batch_size: 16
+
+# Seed
+seed: 1
