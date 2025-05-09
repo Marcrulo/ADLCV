@@ -95,38 +95,23 @@ ddim.classifier = classifier
 # Get an image
 train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=1, transform=transform)
 
-examples = [0,1,2,3,4,5,6,7]
-Xsize = len(examples)
-fig, axs = plt.subplots(Xsize, 4, figsize=(12,2*Xsize))
-for i, ex_index in enumerate(examples):
-    image, label = val_loader.dataset.dataset[ex_index]
+for ex_index in range(len(train_loader.dataset.dataset)):
+    print(ex_index)
+    image, label = train_loader.dataset.dataset[ex_index]
     x0 = image.unsqueeze(0).to(device) # add batch dimenstion
-    x_new = torch.zeros_like(x0).repeat(Xsize,1,1,1)
 
     # 2. DDPM forward process that image up to a timestep t: 1<L<T
     xt, noise = ddpm.q_sample(x0, L)
 
     x_new = ddim.p_sample_loop(model=model, batch_size=1, partly_noised=xt, L=L.item(), y=torch.tensor([0]), gradient_scale=gradient_scale)
-    img1 = im_normalize(tens2image(x0.cpu()))
-    img2 = im_normalize(tens2image(xt.cpu()))
-    img3 = im_normalize(tens2image(x_new.cpu()))
-    diff_img = np.linalg.norm( img1 - img3, axis=2)
-    img4 = im_normalize( diff_img )
+    x_new = x_new.squeeze(0).permute(1, 2, 0).cpu().numpy()
 
-    im1 = axs[i,0].imshow(img1)
-    im2 = axs[i,1].imshow(img2)
-    im3 = axs[i,2].imshow(img3)
-    im4 = axs[i,3].imshow(img4**2, vmin=0, vmax=1, cmap='jet')
-    fig.colorbar(im4, ax=axs[i,3])
-
-
-    titles = ["Original", f"Noised to t={L.item()}/500", "Denoised", "Difference image $(^2)$"]
-    for j, title in enumerate(titles):
-        axs[i,j].set_title(title)
-
-plt.tight_layout()
-plt.savefig(f"assets/inference_test/L={L.item()}-s={gradient_scale}.png")
-plt.close()
+    name = train_loader.dataset.dataset.image_paths[ex_index]
+    name = name.split("/")[-1]
+    name = name.split(".")[0]
+    name = name.split("_")[1]
+    image = Image.fromarray(x_new)
+    image.save(f"../../data/new_images/{name}.png")
 
 
 ###########################################

@@ -33,7 +33,7 @@ def prepare_dataloader(batch_size=batch_size, val_batch_size=batch_size, label="
         generator=torch.Generator().manual_seed(SEED),
     )
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False)
     val_loader = DataLoader(val_dataset, batch_size=val_batch_size, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=val_batch_size, shuffle=False)
 

@@ -44,10 +44,12 @@ class LesionDataset(torch.utils.data.Dataset):
         else:
             self.labels = pd.read_csv(self.data_path + f"/{self.config['shortcut_file']}")[["image", "ruler"]]
 
-        if keep_label is not None:
+        if keep_label == 'cg':
+            self.labels = self.labels[['ruler']]
+        elif keep_label is not None:
             shortcut_mask = self.labels['ruler'] == keep_label
             self.labels = self.labels[shortcut_mask]
-            self.image_paths = list(compress(self.image_paths, shortcut_mask))
+            self.image_paths = list(np.array(self.image_paths)[shortcut_mask])
 
         if transform == None:
             train_transform = transforms.Compose(
@@ -61,8 +63,7 @@ class LesionDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         "Generates one sample of data"
-        image_path = self.image_paths[idx]
-
+        image_path = self.image_paths[idx] 
         image = Image.open(image_path).convert("RGB")
         X = self.transform(image)
 

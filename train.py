@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import datetime
+import time
+datestr = datetime.datetime.fromtimestamp(time.time()).strftime('%Y_%m_%d_%H_%M_%S')
 
 from PIL import Image
 import random
@@ -17,6 +20,7 @@ import wandb
 logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.INFO, datefmt="%I:%M:%S")
 
 from ddpm import Diffusion
+from ddim import DiffusionImplicit
 from model import UNet
 
 ##############
@@ -28,7 +32,7 @@ from utils import *
 
 
 def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim=256,
-          batch_size=100, lr=1e-3, num_epochs=30, experiment_name="ddpm", show=False, wandb_run=None):
+          batch_size=100, lr=1e-3, num_epochs=30, experiment_name="DDPM-cg", show=False, wandb_run=None):
     """Implements algrorithm 1 (Training) from the ddpm paper at page 4"""
     create_result_folders(experiment_name)
 
@@ -44,33 +48,10 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
 
     model = UNet(img_size=img_size, c_in=input_channels, c_out=input_channels, 
                  time_dim=time_dim,channels=channels, device=device).to(device)
-    diffusion = Diffusion(img_size=img_size, T=T, beta_start=1e-4, beta_end=0.02, device=device)
+    diffusion = DiffusionImplicit(img_size=img_size, T=T, beta_start=1e-4, beta_end=0.02, device=device)
 
     optimizer = optim.AdamW(model.parameters(), lr=lr)
     mse = torch.nn.MSELoss() # use MSE loss 
-    
-    # logger = SummaryWriter(os.path.join("runs", experiment_name))
-    # l = len(train_loader)
-
-
-    # accumulation_steps = 32  # for example, simulate a batch 4x larger
-    # for epoch in range(1, num_epochs + 1):
-    #     logging.info(f"Starting epoch {epoch}:")
-    #     pbar = tqdm(train_loader)
-    #     optimizer.zero_grad()  # move this outside the loop
-    #     for i, (images, labels) in enumerate(pbar):
-    #         images = images.to(device)
-    #         t = diffusion.sample_timesteps(images.shape[0]).to(device)
-    #         x_t, noise = diffusion.q_sample(images, t)
-    #         predicted_noise = model(x_t, t)
-    #         loss = mse(noise, predicted_noise)
-    #         # Normalize loss to account for accumulation
-    #         loss = loss / accumulation_steps
-    #         loss.backward()
-    #         # Update weights only every accumulation_steps iterations
-    #         if (i + 1) % accumulation_steps == 0 or (i + 1) == len(pbar):
-    #             optimizer.step()
-    #             optimizer.zero_grad()
 
     for epoch in range(1, num_epochs + 1):
         # logging.info(f"Starting epoch {epoch}:")
@@ -96,10 +77,12 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
 
         if epoch % 5 == 0:
             sampled_images = diffusion.p_sample_loop(model, batch_size=batch_size)
-            save_images(images=sampled_images, path=os.path.join("results", experiment_name, f"{epoch}.jpg"),
+            # create folder results/<datestr>
+            os.makedirs("results/"+datestr, exist_ok=True)
+            os.makedirs("models/"+datestr, exist_ok=True)
+            save_images(images=sampled_images, path=os.path.join("results", datestr, f"{epoch}.jpg"),
                         show=show, title=f'Epoch {epoch}')
-
-            torch.save(model.state_dict(), os.path.join("models", experiment_name, f"weights.pt"))
+            torch.save(model.state_dict(), os.path.join("models", datestr, f"weights.pt"))
 
 
 def main():
