@@ -69,7 +69,7 @@ transform = transforms.Compose([
 ])
 
 ddpm = Diffusion(        img_size=img_size, device=device, diff_type='DDPM-cg')
-ddim = DiffusionImplicit(img_size=img_size, device=device, diff_type='DDPM-cg')
+ddim = DiffusionImplicit(img_size=img_size, device=device)
 
 ###########################################
 ###########################################
@@ -79,7 +79,9 @@ ddim = DiffusionImplicit(img_size=img_size, device=device, diff_type='DDPM-cg')
 model = UNet(img_size=img_size, device=device)
 model.eval()
 model.to(device)
-model.load_state_dict(torch.load('models/ddpm/weights.pt', map_location=device, weights_only=False)) # load the given model
+# folder = "ddpm"
+folder = "2025_05_10_06_52_13"
+model.load_state_dict(torch.load(f'models/{folder}/weights.pt', map_location=device, weights_only=False)) # load the given model
 
 # Classifier
 classifier = Classifier(

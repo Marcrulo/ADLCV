@@ -72,6 +72,8 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
             if (i + 1) % accumulation_steps == 0 or (i + 1) == len(pbar):
                 optimizer.step()
                 optimizer.zero_grad()
+            if wandb_run is not None:
+                wandb_run.log({"MSE": loss.item()})
 
     # for epoch in range(1, num_epochs + 1):
     #     # logging.info(f"Starting epoch {epoch}:")
