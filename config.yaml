@@ -12,8 +12,8 @@ shortcut_file: "shortcuts.csv"
 
 # New image size (width, height)
 # size: [576, 448]
-size : [72,56]
-# size : [144, 112]
+# size : [72,56]
+size : [144, 112]
 
 # Train_size
 lesion_train: 0.7
@@ -25,7 +25,7 @@ lesion_val: 0.15
 lesion_test: 0.15
 
 # Batch size
-batch_size: 16
+batch_size: 1
 
 # Seed
 seed: 1

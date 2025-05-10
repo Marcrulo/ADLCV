@@ -93,7 +93,7 @@ ddim.classifier = classifier
 
 
 # Get an image
-train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=1, transform=transform)
+train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=None, transform=transform)
 
 for ex_index in range(len(train_loader.dataset.dataset)):
     print(ex_index)

@@ -48,40 +48,60 @@ def train(img_size, device='cpu', T=500, input_channels=3, channels=32, time_dim
 
     model = UNet(img_size=img_size, c_in=input_channels, c_out=input_channels, 
                  time_dim=time_dim,channels=channels, device=device).to(device)
-    diffusion = DiffusionImplicit(img_size=img_size, T=T, beta_start=1e-4, beta_end=0.02, device=device)
+    diffusion = Diffusion(img_size=img_size, T=T, beta_start=1e-4, beta_end=0.02, device=device)
 
     optimizer = optim.AdamW(model.parameters(), lr=lr)
     mse = torch.nn.MSELoss() # use MSE loss 
 
+
+    accumulation_steps = 16  # for example, simulate a batch 4x larger
     for epoch in range(1, num_epochs + 1):
-        # logging.info(f"Starting epoch {epoch}:")
-        # pbar = tqdm(train_loader)
-        
-        for i, (images, labels) in enumerate(train_loader): #enumerate(pbar):
+        logging.info(f"Starting epoch {epoch}:")
+        pbar = tqdm(train_loader)
+        optimizer.zero_grad()  # move this outside the loop
+        for i, (images, labels) in enumerate(pbar):
             images = images.to(device)
-
-            # TASK 4: implement the training loop
-            t = diffusion.sample_timesteps(images.shape[0]).to(device) # line 3 from the Training algorithm
-            x_t, noise = diffusion.q_sample(images, t) # inject noise to the images (forward process), HINT: use q_sample
-            predicted_noise = model(x_t, t) # predict noise of x_t using the UNet
+            t = diffusion.sample_timesteps(images.shape[0]).to(device)
+            x_t, noise = diffusion.q_sample(images, t)
+            predicted_noise = model(x_t, t)
             loss = mse(noise, predicted_noise)
-            
-            optimizer.zero_grad()
+            # Normalize loss to account for accumulation
+            loss = loss / accumulation_steps
             loss.backward()
-            optimizer.step()
+            # Update weights only every accumulation_steps iterations
+            if (i + 1) % accumulation_steps == 0 or (i + 1) == len(pbar):
+                optimizer.step()
+                optimizer.zero_grad()
 
-            # pbar.set_postfix(MSE=loss.item())
-            # logger.add_scalar("MSE", loss.item(), global_step=epoch * l + i)
-            if wandb_run is not None:
-                wandb_run.log({"MSE": loss.item()})
+    # for epoch in range(1, num_epochs + 1):
+    #     # logging.info(f"Starting epoch {epoch}:")
+    #     # pbar = tqdm(train_loader)
+        
+    #     for i, (images, labels) in enumerate(train_loader): #enumerate(pbar):
+    #         images = images.to(device)
+
+    #         # TASK 4: implement the training loop
+    #         t = diffusion.sample_timesteps(images.shape[0]).to(device) # line 3 from the Training algorithm
+    #         x_t, noise = diffusion.q_sample(images, t) # inject noise to the images (forward process), HINT: use q_sample
+    #         predicted_noise = model(x_t, t) # predict noise of x_t using the UNet
+    #         loss = mse(noise, predicted_noise)
+            
+    #         optimizer.zero_grad()
+    #         loss.backward()
+    #         optimizer.step()
+
+    #         # pbar.set_postfix(MSE=loss.item())
+    #         # logger.add_scalar("MSE", loss.item(), global_step=epoch * l + i)
+    #         if wandb_run is not None:
+    #             wandb_run.log({"MSE": loss.item()})
 
         if epoch % 5 == 0:
-            sampled_images = diffusion.p_sample_loop(model, batch_size=batch_size)
-            # create folder results/<datestr>
-            os.makedirs("results/"+datestr, exist_ok=True)
+            # sampled_images = diffusion.p_sample_loop(model, batch_size=batch_size)
+            # # create folder results/<datestr>
+            # os.makedirs("results/"+datestr, exist_ok=True)
             os.makedirs("models/"+datestr, exist_ok=True)
-            save_images(images=sampled_images, path=os.path.join("results", datestr, f"{epoch}.jpg"),
-                        show=show, title=f'Epoch {epoch}')
+            # save_images(images=sampled_images, path=os.path.join("results", datestr, f"{epoch}.jpg"),
+            #             show=show, title=f'Epoch {epoch}')
             torch.save(model.state_dict(), os.path.join("models", datestr, f"weights.pt"))
 
 

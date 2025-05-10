@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from ddpm import Diffusion
 
 class DiffusionImplicit(Diffusion):
-    def __init__(self, T=500, beta_start=1e-4, beta_end=0.02, diff_type='DDIM', img_size=16, device="cuda"):
+    def __init__(self, T=500, beta_start=1e-4, beta_end=0.02, img_size=16, device="cuda"):
         """
         T : total diffusion steps (X_T is pure noise N(0,1))
         beta_start: value of beta for t=0
@@ -19,7 +19,7 @@ class DiffusionImplicit(Diffusion):
                 * DDIM-cg: DDIM with classifier guidance (https://arxiv.org/pdf/2105.05233.pdf)
                 * DDIM-cFg: DDIM with classifier FREE guidance (https://arxiv.org/pdf/2207.12598.pdf)    
         """
-        super().__init__(T=T, beta_start=beta_start, beta_end=beta_end, diff_type=diff_type, img_size=img_size, device=device)
+        super().__init__(T=T, beta_start=beta_start, beta_end=beta_end, img_size=img_size, device=device)
     
     def p_sample(self, model, x_t, t, y=None, gradient_scale=1):
         """
