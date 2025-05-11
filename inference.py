@@ -37,8 +37,8 @@ class AddColorBlobs:
 
         for _ in range(self.num_blobs):
             # Random blob position and size
-            x = 60#random.randint(0, width)
-            y = 15#random.randint(0, height)
+            x = random.randint(0, width)
+            y = random.randint(0, height)
             r = 4#random.randint(*self.size_range)
 
             # Random color
@@ -63,8 +63,8 @@ gradient_scale = float(sys.argv[2])
 transform = transforms.Compose([
     transforms.Resize((img_size[0], img_size[1])),
     transforms.ToTensor(),                # from [0,255] to range [0.0,1.0]
-    # AddColorBlobs(num_blobs=1),
-    # transforms.ToTensor(),
+    AddColorBlobs(num_blobs=1),
+    transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,))  # range [-1,1]
 ])
 
@@ -97,7 +97,7 @@ ddim.classifier = classifier
 # Get an image
 train_loader, val_loader, test_loader = prepare_dataloader(batch_size, label='shortcut', keep_label=1, transform=transform)
 
-examples = [0,1,2,3,4,5,6,7]
+examples = [0,1,2]#,3,4,5,6,7]
 Xsize = len(examples)
 fig, axs = plt.subplots(Xsize, 4, figsize=(12,2*Xsize))
 for i, ex_index in enumerate(examples):

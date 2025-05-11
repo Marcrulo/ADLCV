@@ -79,7 +79,8 @@ ddim = DiffusionImplicit(img_size=img_size, device=device, diff_type='DDPM-cg')
 model = UNet(img_size=img_size, device=device)
 model.eval()
 model.to(device)
-model.load_state_dict(torch.load('models/ddpm/weights.pt', map_location=device, weights_only=False)) # load the given model
+folder = "2025_05_10_06_52_13"
+model.load_state_dict(torch.load(f'models/{folder}/weights.pt', map_location=device, weights_only=False)) # load the given model
 
 # Classifier
 classifier = Classifier(
@@ -111,7 +112,7 @@ for ex_index in range(len(train_loader.dataset.dataset)):
     name = name.split(".")[0]
     name = name.split("_")[1]
     image = Image.fromarray(x_new)
-    image.save(f"../../data/new_images/{name}.png")
+    image.save(f"../../data/trainwoDots/{name}.png")
 
 
 ###########################################
